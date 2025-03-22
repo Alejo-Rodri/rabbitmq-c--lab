@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "idj0nrxX2J4=",
+  "success": true,
+  "projectFilePath": "/home/ale/Documents/c_sharp-projects/rabbit-lab/rabbit-lab.csproj",
+  "expectedPackageFiles": [
+    "/home/ale/.nuget/packages/rabbitmq.client/7.1.2/rabbitmq.client.7.1.2.nupkg.sha512",
+    "/home/ale/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
+    "/home/ale/.nuget/packages/system.threading.ratelimiting/8.0.0/system.threading.ratelimiting.8.0.0.nupkg.sha512",
+    "/home/ale/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.3/microsoft.aspnetcore.app.ref.9.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
