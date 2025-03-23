@@ -8,14 +8,13 @@ const string QUEUE_NAME = "rpc_queue";
 
 var factory = new ConnectionFactory
 {
-    HostName = "192.168.1.14", // Cambia esto por la IP del servidor RabbitMQ
-    UserName = "guest",    // Usuario de RabbitMQ
-    Password = "guest", // Contraseña de RabbitMQ
-    VirtualHost = "/",          // Cambia esto si usas otro Virtual Host
-    Port = 5672                 // Puerto por defecto de RabbitMQ
+    HostName = "192.168.1.11",
+    UserName = "my_user",
+    Password = "ultra_secure_password",
+    VirtualHost = "/",
+    Port = 5672
 };
 
-//var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
@@ -23,6 +22,9 @@ await channel.QueueDeclareAsync(queue: QUEUE_NAME, durable: false, exclusive: fa
     autoDelete: false, arguments: null);
 
 await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
+
+var emit = new ToTransmisorEmit(factory);
+var toClient = new ToClientEmit(factory);
 
 var consumer = new AsyncEventingBasicConsumer(channel);
 consumer.ReceivedAsync += async (object sender, BasicDeliverEventArgs ea) =>
@@ -43,20 +45,23 @@ consumer.ReceivedAsync += async (object sender, BasicDeliverEventArgs ea) =>
         var message = Encoding.UTF8.GetString(body);
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(message);
 
-        if (jsonObject != null && jsonObject.ContainsKey("type"))
+        if (jsonObject != null && jsonObject.TryGetValue("type", out var JType))
         {
-            string type = jsonObject["type"].ToString();
+            if (JType == null) 
+            {
+                throw new JsonException("could not acces type value");
+            }
+
+            string type = JType.ToString()!;
 
             if (type == "offer")
             {
-                var emit = new ToTransmisorEmit(factory);
-                emit.Send(message); // Send the entire JSON message
+                emit.Send(message);
                 response = "Offer processed";
             }
             else if (type == "answer")
             {
-                var toClient = new ToClientEmit(factory);
-                toClient.send(message); // Send the entire JSON message
+                toClient.send(message);
                 response = "Answer processed";
             }
             else
